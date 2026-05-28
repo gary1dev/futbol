@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# Datos generados (el scraper los regenera)
+data/iacip_datos.json
+
+# Archivos de inspección temporales
+scraper/_inspect*.py
+scraper/_apppc*.txt
+scraper/_decoded*.txt
+scraper/_api_url*.txt
+scraper/_manual*.txt
+scraper/_init_js*.txt
+
+# Node (si se usa netlify dev)
+node_modules/
+.netlify/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partidos en Vivo — RojaDirecta</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <div class="glass-container">
+        <header class="glass-header">
+            <div class="header-left">
+                <div class="logo-badge">⚽ LIVE</div>
+                <div>
+                    <h1>Partidos en Vivo</h1>
+                    <p class="subtitle">Futbol — Transmisiones del día</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="status-indicator" id="scraper-status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Conectando...</span>
+                </div>
+                <button id="theme-toggle" class="btn-toggle" title="Cambiar tema">
+                    <span class="icon-sun">☀</span>
+                    <span class="icon-moon">☽</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <span class="stat-number" id="total-partidos">—</span>
+                <span class="stat-label">Partidos hoy</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="total-canales">—</span>
+                <span class="stat-label">Canales disponibles</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="total-comps">—</span>
+                <span class="stat-label">Competiciones</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="ultima-actualizacion">—</span>
+                <span class="stat-label">Actualizado</span>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <input type="text" id="search-input" class="glass-input" placeholder="Buscar equipo o competición...">
+            <select id="category-filter" class="glass-select">
+                <option value="">Todas las competiciones</option>
+                <option value="amistoso">Amistoso</option>
+                <option value="libertadores">Copa Libertadores</option>
+                <option value="sudamericana">Copa Sudamericana</option>
+                <option value="champions">Champions League</option>
+                <option value="premier">Premier League</option>
+                <option value="laliga">LaLiga</option>
+                <option value="liga_mx">Liga MX</option>
+                <option value="mundial">Mundial</option>
+            </select>
+            <button id="btn-refresh" class="btn-action">
+                <span id="refresh-icon">↻</span> Actualizar
+            </button>
+        </div>
+
+        <main class="content-grid" id="content-grid">
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+        </main>
+
+        <div id="empty-state" class="empty-state" style="display:none">
+            <div class="empty-icon">⚽</div>
+            <p>No se encontraron partidos. Ejecuta el scraper para actualizar.</p>
+            <code>python scraper/main.py</code>
+        </div>
+
+        <footer class="glass-footer">
+            <span>RojaDirecta Dashboard</span>
+            <span id="last-fetch-time">Sin datos recientes</span>
+        </footer>
+    </div>
+
+    <!-- ── Player modal ── -->
+    <div id="player-overlay" class="player-overlay" style="display:none" aria-modal="true">
+        <div class="player-modal">
+            <div class="player-header">
+                <div class="player-title-block">
+                    <span class="player-comp" id="player-comp"></span>
+                    <span class="player-match" id="player-match"></span>
+                </div>
+                <button class="player-close" id="player-close" title="Cerrar">✕</button>
+            </div>
+
+            <div class="player-frame-wrap">
+                <iframe id="player-iframe"
+                    allowfullscreen
+                    allow="autoplay; fullscreen"
+                    sandbox="allow-scripts allow-forms allow-presentation allow-autoplay"
+                    style="width:100%;height:100%;border:none;">
+                </iframe>
+            </div>
+
+            <div class="player-footer">
+                <button class="player-btn" id="player-reload" title="Recargar">
+                    <span class="pbtn-icon">↻</span>
+                    <span class="pbtn-label">Recargar</span>
+                </button>
+                <button class="player-btn" id="player-fullscreen" title="Pantalla completa">
+                    <span class="pbtn-icon">⛶</span>
+                    <span class="pbtn-label">Pantalla completa</span>
+                </button>
+                <button class="player-btn player-btn-report" id="player-report" title="Reportar problema">
+                    <span class="pbtn-icon">⚑</span>
+                    <span class="pbtn-label">Reportar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
