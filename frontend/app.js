@@ -137,22 +137,38 @@ const btnFullscreen = document.getElementById('player-fullscreen');
 const btnReport     = document.getElementById('player-report');
 
 let currentUrl = '';
+let _noLoadTimer = null;
+const noLoadMsg = document.getElementById('player-no-load');
+
+function showNoLoad(show) {
+    if (!noLoadMsg) return;
+    noLoadMsg.style.display = show ? 'flex' : 'none';
+    btnReload.classList.toggle('player-btn-pulse', show);
+}
 
 function openPlayer(url, equipos, canal, comp) {
-    // fix #1: bloquea esquemas distintos de http/https
     const safe = safeUrl(url);
     if (!safe) return;
     currentUrl = safe;
     playerComp.textContent  = comp || 'EN VIVO';
     playerMatch.textContent = `${equipos}  —  ${canal}`;
+    showNoLoad(false);
     iframe.src = safe;
     overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
+
+    // Si en 12 s el iframe sigue sin cargar, avisa al usuario
+    clearTimeout(_noLoadTimer);
+    _noLoadTimer = setTimeout(() => showNoLoad(true), 12000);
+    iframe.onload = () => { clearTimeout(_noLoadTimer); showNoLoad(false); };
 }
 
 function closePlayer() {
+    clearTimeout(_noLoadTimer);
+    showNoLoad(false);
     overlay.style.display = 'none';
     iframe.src = '';
+    iframe.onload = null;
     currentUrl = '';
     document.body.style.overflow = '';
 }
