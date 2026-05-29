@@ -5,6 +5,9 @@
 [build.environment]
   NODE_VERSION = "18"
 
+[functions]
+  timeout = 26
+
 # Redirige /api/datos → la Function JS
 [[redirects]]
   from = "/api/datos"

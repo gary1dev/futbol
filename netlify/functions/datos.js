@@ -143,34 +143,58 @@ function normalizeApiEvents(events) {
     });
 }
 
+// Fetch con timeout compatible con todas las versiones de Node 18
+function fetchConTimeout(url, options, ms) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), ms);
+    return fetch(url, { ...options, signal: controller.signal })
+        .finally(() => clearTimeout(timer));
+}
+
 async function fetchDatos() {
     // 1. Intenta Cloudflare Worker
     try {
         const apiUrl = decodeApiUrl();
-        const res = await fetch(apiUrl, {
-            headers: { ...HEADERS, Accept: "application/json" },
-            signal: AbortSignal.timeout(7000),
-        });
+        console.log("[datos] Intentando API:", apiUrl);
+        const res = await fetchConTimeout(
+            apiUrl,
+            { headers: { ...HEADERS, Accept: "application/json" } },
+            8000
+        );
         if (res.ok) {
             const data = await res.json();
             const events = Array.isArray(data) ? data
                 : data.events || data.matches || data.data || data.result || [];
-            if (events.length > 0) return normalizeApiEvents(events);
+            if (events.length > 0) {
+                console.log("[datos] API OK:", events.length, "eventos");
+                return normalizeApiEvents(events);
+            }
         }
-    } catch { /* fallback */ }
+        console.log("[datos] API status:", res.status, "— pasando a fallback");
+    } catch (e) {
+        console.log("[datos] API error:", e.message, "— pasando a fallback");
+    }
 
     // 2. Parsea EVENTOS_MANUALES desde app-pc.js
     try {
-        const res = await fetch(`${BASE_URL}/app-pc.js?v=348`, {
-            headers: HEADERS,
-            signal: AbortSignal.timeout(10000),
-        });
+        console.log("[datos] Descargando app-pc.js...");
+        const res = await fetchConTimeout(
+            `${BASE_URL}/app-pc.js?v=348`,
+            { headers: HEADERS },
+            15000
+        );
         if (res.ok) {
             const js = await res.text();
-            return parseJs(js);
+            const partidos = parseJs(js);
+            console.log("[datos] app-pc.js OK:", partidos.length, "partidos");
+            return partidos;
         }
-    } catch { /* sin datos */ }
+        console.log("[datos] app-pc.js status:", res.status);
+    } catch (e) {
+        console.log("[datos] app-pc.js error:", e.message);
+    }
 
+    console.log("[datos] Sin datos de ninguna fuente");
     return [];
 }
 
