@@ -2,15 +2,12 @@
   publish = "frontend"
   functions = "netlify/functions"
 
-[build.environment]
-  NODE_VERSION = "18"
-
 [[redirects]]
   from = "/api/datos"
-  to   = "/.netlify/functions/datos"
+  to = "/.netlify/functions/datos"
   status = 200
 
 [[redirects]]
-  from   = "/*"
-  to     = "/index.html"
+  from = "/*"
+  to = "/index.html"
   status = 200
