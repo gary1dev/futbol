@@ -1,11 +1,8 @@
 /* RojaDirecta Dashboard — app.js */
 
-// En Netlify: /api/datos → redirigido a /.netlify/functions/datos (netlify.toml)
-// En local con Flask: http://localhost:5000/api/datos (Flask lo sirve directamente)
-const API_URL   = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:5000/api/datos'
-    : '/api/datos';
-const DATA_FILE = '/data/iacip_datos.json';
+const _isLocal  = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_URL   = _isLocal ? 'http://localhost:5000/api/datos' : '/api/datos';
+const DATA_FILE = _isLocal ? 'http://localhost:5000/api/datos' : null; // en prod no hay archivo local
 
 // ── Colores por competición ───────────────────────────────
 const COMP_COLORS = {
@@ -178,7 +175,15 @@ overlay.addEventListener('click', e => { if (e.target === overlay) closePlayer()
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closePlayer(); });
 
 btnReload.addEventListener('click', () => {
-    if (currentUrl) { iframe.src = ''; setTimeout(() => { iframe.src = currentUrl; }, 80); }
+    if (!currentUrl) return;
+    clearTimeout(_noLoadTimer);
+    showNoLoad(false);
+    iframe.src = '';
+    setTimeout(() => {
+        iframe.src = currentUrl;
+        _noLoadTimer = setTimeout(() => showNoLoad(true), 12000);
+        iframe.onload = () => { clearTimeout(_noLoadTimer); showNoLoad(false); };
+    }, 80);
 });
 
 btnFullscreen.addEventListener('click', () => {
@@ -247,7 +252,7 @@ async function loadData() {
         if (res.ok) { payload = await res.json(); setStatus('active', 'API activa'); }
     } catch { /* sin API — usa archivo */ }
 
-    if (!payload) {
+    if (!payload && DATA_FILE) {
         try {
             const res = await fetch(DATA_FILE, { signal: AbortSignal.timeout(4000) });
             if (res.ok) { payload = await res.json(); setStatus('active', 'Archivo local'); }

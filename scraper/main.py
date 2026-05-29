@@ -271,10 +271,11 @@ def save(datos: list[dict]) -> None:
         },
         "datos": datos,
     }
-    OUTPUT_FILE.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    # Escritura atómica: escribe en .tmp y luego reemplaza, evitando JSON truncado
+    tmp = OUTPUT_FILE.with_suffix(".tmp")
+    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    import os
+    os.replace(tmp, OUTPUT_FILE)
     log.info("Guardado: %s (%d partidos)", OUTPUT_FILE, len(datos))
 
 

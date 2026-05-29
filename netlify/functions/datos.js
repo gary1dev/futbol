@@ -159,7 +159,7 @@ async function fetchDatos() {
         const res = await fetchConTimeout(
             apiUrl,
             { headers: { ...HEADERS, Accept: "application/json" } },
-            8000
+            3500
         );
         if (res.ok) {
             const data = await res.json();
@@ -179,9 +179,9 @@ async function fetchDatos() {
     try {
         console.log("[datos] Descargando app-pc.js...");
         const res = await fetchConTimeout(
-            `${BASE_URL}/app-pc.js?v=348`,
+            `${BASE_URL}/app-pc.js`,
             { headers: HEADERS },
-            15000
+            5000
         );
         if (res.ok) {
             const js = await res.text();
