@@ -174,7 +174,8 @@ async function fetchDatos() {
     return [];
 }
 
-export const handler = async () => {
+// CommonJS export — máxima compatibilidad con Netlify Functions
+exports.handler = async () => {
     try {
         const datos = await fetchDatos();
         return {
