@@ -2,19 +2,16 @@
   publish = "frontend"
   functions = "netlify/functions"
 
-# Redirige /api/datos → la Function serverless
-# Así app.js puede seguir usando /api/datos en todos los entornos
+[functions]
+  node_bundler = "esbuild"
+
+# Redirige /api/datos → la Function JS
 [[redirects]]
   from = "/api/datos"
   to   = "/.netlify/functions/datos"
   status = 200
 
-[[redirects]]
-  from = "/api/status"
-  to   = "/.netlify/functions/status"
-  status = 200
-
-# SPA fallback: cualquier ruta desconocida sirve index.html
+# SPA fallback
 [[redirects]]
   from   = "/*"
   to     = "/index.html"
