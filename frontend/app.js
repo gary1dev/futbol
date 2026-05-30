@@ -281,5 +281,13 @@ async function loadData() {
     _loading = false;
 }
 
+// ── Pantalla de carga ─────────────────────────
+const splashScreen = document.getElementById('splash-screen');
+
+function hideSplash() {
+    if (!splashScreen) return;
+    splashScreen.classList.add('splash-hidden');
+}
+
 refreshBtn.addEventListener('click', loadData);
-loadData();
+loadData().finally(hideSplash);

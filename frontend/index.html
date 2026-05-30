@@ -3,10 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Partidos en Vivo — RojaDirecta</title>
+    <title>Partidos en Vivo — FutbolTotal</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- ── Pantalla de carga ── -->
+    <div id="splash-screen" class="splash-screen" aria-live="polite">
+        <div class="splash-glass">
+            <div class="splash-logo">
+                <span class="splash-ball">⚽</span>
+                <span class="splash-brand">FutbolTotal</span>
+            </div>
+            <div class="splash-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring spinner-ring--2"></div>
+            </div>
+            <p class="splash-msg">Cargando partidos del día...</p>
+        </div>
+    </div>
+
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
@@ -17,7 +32,7 @@
                 <div class="logo-badge">⚽ LIVE</div>
                 <div>
                     <h1>Partidos en Vivo</h1>
-                    <p class="subtitle">Futbol — Transmisiones del día</p>
+                    <p class="subtitle">FutbolTotal — Transmisiones del día</p>
                 </div>
             </div>
             <div class="header-right">
@@ -77,12 +92,11 @@
 
         <div id="empty-state" class="empty-state" style="display:none">
             <div class="empty-icon">⚽</div>
-            <p>No se encontraron partidos. Ejecuta el scraper para actualizar.</p>
-            <code>python scraper/main.py</code>
+            <p>No se encontraron partidos.</p>
         </div>
 
         <footer class="glass-footer">
-            <span>RojaDirecta Dashboard</span>
+            <span>FutbolTotal Dashboard</span>
             <span id="last-fetch-time">Sin datos recientes</span>
         </footer>
     </div>
