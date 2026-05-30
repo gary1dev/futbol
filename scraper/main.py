@@ -5,10 +5,11 @@ Como respaldo intenta la API del Cloudflare Worker.
 """
 
 import json
-import re
-import time
 import math
 import logging
+import os
+import re
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -103,11 +104,11 @@ def canal_nombre(url: str) -> str:
     return url.split("/")[-1] or "Canal"
 
 
-def fetch_js(version: int = 348) -> str | None:
-    url = f"{BASE_URL}/app-pc.js?v={version}"
+def fetch_js() -> str | None:
+    url = f"{BASE_URL}/app-pc.js"
     try:
         time.sleep(1.5)
-        r = requests.get(url, headers=HEADERS, timeout=15)
+        r = requests.get(url, headers=HEADERS, timeout=(5, 12))
         r.raise_for_status()
         r.encoding = "utf-8"
         return r.text
@@ -219,7 +220,7 @@ def fetch_from_api() -> list[dict]:
         r = requests.get(
             api_url,
             headers={**HEADERS, "Accept": "application/json"},
-            timeout=10,
+            timeout=(5, 10),  # (connect, read) — evita bloqueo en servidores lentos
         )
         if not r.ok:
             log.warning("API retornó %d", r.status_code)
@@ -256,8 +257,14 @@ def fetch_from_api() -> list[dict]:
                 "fecha":       datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S"),
             })
         return partidos
+    except requests.RequestException as e:
+        log.warning("Error de red en API: %s", e)
+        return []
+    except ValueError as e:
+        log.warning("Respuesta no-JSON desde API (¿bloqueo Cloudflare?): %s", e)
+        return []
     except Exception as e:
-        log.warning("Error en API: %s", e)
+        log.warning("Error inesperado en API: %s", e)
         return []
 
 
@@ -273,9 +280,12 @@ def save(datos: list[dict]) -> None:
     }
     # Escritura atómica: escribe en .tmp y luego reemplaza, evitando JSON truncado
     tmp = OUTPUT_FILE.with_suffix(".tmp")
-    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    import os
-    os.replace(tmp, OUTPUT_FILE)
+    try:
+        tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        os.replace(tmp, OUTPUT_FILE)
+    except OSError:
+        tmp.unlink(missing_ok=True)
+        raise
     log.info("Guardado: %s (%d partidos)", OUTPUT_FILE, len(datos))
 
 

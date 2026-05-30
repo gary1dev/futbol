@@ -87,6 +87,13 @@ function safeUrl(url = '') {
     return /^https?:\/\//i.test(url) ? url : '';
 }
 
+// fix #2: reemplaza AbortSignal.timeout() — no disponible en Safari ≤ 15
+function abortAfter(ms) {
+    const ctrl = new AbortController();
+    setTimeout(() => ctrl.abort(), ms);
+    return ctrl.signal;
+}
+
 // ── Renderizado de tarjeta de partido ─────────────────────
 function renderCard(p) {
     const color   = COMP_COLORS[p.categoria] || COMP_COLORS.otro;
@@ -178,6 +185,7 @@ btnReload.addEventListener('click', () => {
     if (!currentUrl) return;
     clearTimeout(_noLoadTimer);
     showNoLoad(false);
+    iframe.onload = null;   // evita que el onload anterior cancele el timer nuevo
     iframe.src = '';
     setTimeout(() => {
         iframe.src = currentUrl;
@@ -248,13 +256,13 @@ async function loadData() {
     let payload = null;
 
     try {
-        const res = await fetch(API_URL, { signal: AbortSignal.timeout(4000) });
+        const res = await fetch(API_URL, { signal: abortAfter(9500) });
         if (res.ok) { payload = await res.json(); setStatus('active', 'API activa'); }
     } catch { /* sin API — usa archivo */ }
 
     if (!payload && DATA_FILE) {
         try {
-            const res = await fetch(DATA_FILE, { signal: AbortSignal.timeout(4000) });
+            const res = await fetch(DATA_FILE, { signal: abortAfter(9500) });
             if (res.ok) { payload = await res.json(); setStatus('active', 'Archivo local'); }
         } catch { /* nada */ }
     }

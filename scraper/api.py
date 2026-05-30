@@ -12,7 +12,7 @@ from flask_cors import CORS
 DATA_FILE    = Path(__file__).parent.parent / "data" / "iacip_datos.json"
 FRONTEND_DIR = Path(__file__).parent.parent / "frontend"
 
-app = Flask(__name__, static_folder=str(FRONTEND_DIR))
+app = Flask(__name__, static_folder=None)  # evita ruta /frontend/* automática
 
 # fix #4: CORS restringido solo al origen local
 CORS(app, origins=["http://localhost:5000", "http://127.0.0.1:5000"])

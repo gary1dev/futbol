@@ -163,8 +163,9 @@ async function fetchDatos() {
         );
         if (res.ok) {
             const data = await res.json();
-            const events = Array.isArray(data) ? data
-                : data.events || data.matches || data.data || data.result || [];
+            const raw = Array.isArray(data) ? data
+                : data.events || data.matches || data.data || data.result;
+            const events = Array.isArray(raw) ? raw : [];
             if (events.length > 0) {
                 console.log("[datos] API OK:", events.length, "eventos");
                 return normalizeApiEvents(events);
